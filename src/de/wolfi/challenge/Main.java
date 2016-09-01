@@ -87,7 +87,7 @@ public class Main extends JavaPlugin implements Listener{
 
 	private Location hole = new Location(Bukkit.getWorld("world"), 36, 87, 481);
 	
-	private Location punish = new Location(Bukkit.getWorld("world"),314.0, 191, 217.5);
+	private Location punish = new Location(Bukkit.getWorld("world"),312, 179, 216);
 	
 	private Location finish = new Location(Bukkit.getWorld("world"),276, 59, 289);
 	
@@ -96,7 +96,8 @@ public class Main extends JavaPlugin implements Listener{
 	public static final List<String> wrongAnswers;
 	public static final HashMap<Integer,ArrayList<Dialoge>> dialogs = new HashMap<>();
 
-	public static final String VERSION = "1.6.4-Hotfix";
+	public static final String VERSION = "1.6.5.2-Hotfix";
+	
 	
 	static{
 		ArrayList<Dialoge> zero = new ArrayList<>();
@@ -150,6 +151,8 @@ public class Main extends JavaPlugin implements Listener{
 	
 	@Override
 	public void onEnable() {
+		
+		
 		if(startPoint.getWorld() == null){
 			Bukkit.reload();
 			return;
@@ -781,12 +784,25 @@ public class Main extends JavaPlugin implements Listener{
 				lightNearbyBlocks(newe, used,flood,on);
 			}else if(flood == newe.getType() && !used.contains(newe)){
 				used.add(newe);
-				
+				setBlock(newe);
 				lightNearbyBlocks(newe, used, flood,on);
 			}
 		}
 	}
 	
+	private void setBlock(Block newe) {
+		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+			@SuppressWarnings("deprecation")
+			public void run() {
+				Material m = newe.getRelative(BlockFace.DOWN).getType();
+				if(m == Material.TRIPWIRE) m = Material.AIR;
+				for(Player p : Bukkit.getOnlinePlayers()) p.sendBlockChange(newe.getLocation(), m, (byte) 0);
+			}
+		});
+		
+	}
+
+
 	@EventHandler
 	public void onRSpawn(PlayerRespawnEvent e){
 		if(rsp != null) e.setRespawnLocation(rsp);
